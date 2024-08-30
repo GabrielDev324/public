@@ -113,20 +113,20 @@
 
             function complexEncrypt(text) {
                 let result = "-- This file was generated using flux obfuscator v2.0.0\n\n";
-                const key = 13; // Exemplo de chave simples (pode ser mais complexa)
+                const key = 42; // Exemplo de chave
 
                 result += "local a={";
                 for (let i = 0; i < text.length; i++) {
-                    const charCode = text.charCodeAt(i) + key;
+                    const charCode = text.charCodeAt(i) + (key % 31) - (key % 17);
                     result += `${charCode},`;
                 }
                 result = result.slice(0, -1);
                 result += "};";
 
-                result += "local function __d(t) local r = '' for i = 1, #t do r = r .. string.char(t[i] - " + key + ") end return r end;";
-                result += "local func = load(__d(a));";
-                result += "local __s, __e = pcall(function() func() end);";
-                result += "if not __s then print('^1' .. __e .. '^7') end";
+                result += "local function __d(t, k) local r = '' for i = 1, #t do local n = t[i] local o = n - (k % 31) + (k % 17) r = r .. string.char(o) end return r end;";
+                result += "local function load_obfuscated(data) local k = " + key + " local code = __d(data, k) local func = load(code) return func end;";
+                result += "local obfuscated_func = load_obfuscated(a);";
+                result += "obfuscated_func();";
                 
                 return result;
             }
