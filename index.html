@@ -110,23 +110,28 @@
 
         function encryptScript() {
             const script = document.getElementById('script').value;
-            function encrypt(text) {
-                let result = "-- This file was generated using flux obfuscator v1.0.0\n\n";
+
+            function complexEncrypt(text) {
+                let result = "-- This file was generated using flux obfuscator v2.0.0\n\n";
+                const key = 13; // Exemplo de chave simples (pode ser mais complexa)
+
                 result += "local a={";
                 for (let i = 0; i < text.length; i++) {
-                    const charCode = text.charCodeAt(i);
-                    result += `tonumber('${charCode.toString(36)}', 36),`;
+                    const charCode = text.charCodeAt(i) + key;
+                    result += `${charCode},`;
                 }
                 result = result.slice(0, -1);
                 result += "};";
-                result += "local function __d(t) local r = '' for i = 1, #t do r = r .. string.char(t[i]) end return r end;";
+
+                result += "local function __d(t) local r = '' for i = 1, #t do r = r .. string.char(t[i] - " + key + ") end return r end;";
                 result += "local func = load(__d(a));";
                 result += "local __s, __e = pcall(function() func() end);";
                 result += "if not __s then print('^1' .. __e .. '^7') end";
+                
                 return result;
             }
 
-            const encryptedScript = encrypt(script);
+            const encryptedScript = complexEncrypt(script);
             const blob = new Blob([encryptedScript], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
