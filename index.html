@@ -208,7 +208,7 @@
                         obfuscatedData.push(`(tonumber("${charCode.toString(36)}", 36))`);
                     }
 
-                    let obfuscationLayer = `return(function()local a={${obfuscatedData.join(',')}}local b={}for i=1,#a do b[i]=string.char(((a[i]-${offset})%256)~${xorKey})end return load(table.concat(b))()end)()`;
+                    let obfuscationLayer = `return(function(j,M,w,S,k,d,p,g,c,h,V,B,o,J,D,Z,Y,T,I,R,E,O,r,v,q,G) local function h(f) return function(n) return function(p) return function(x) local a = {${obfuscatedData.join(',')}} local b = {} for i = 1, #a do b[i] = string.char(((a[i] - ${offset}) % 256) ~ ${xorKey}) end return load(table.concat(b))() end end end end return h()() end)()`;
 
                     result += obfuscationLayer;
 
@@ -217,7 +217,7 @@
                     return result;
                 }
             }
-    
+
             const encrypt = createEncryptor();
             const encryptedScript = encrypt(script);
     
