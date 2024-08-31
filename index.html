@@ -3,47 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criptografar Script Lua</title>
+    <title>obfuscator Utf8 Lua</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: 'Roboto', sans-serif;
-            background-color: #0a1a2b;
+            background: linear-gradient(135deg, #0f1c2d, #1d3a4f);
             color: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             width: 100vw;
-            overflow: hidden; /* Impede rolagem enquanto o overlay está visível */
+            overflow: hidden;
         }
 
         .container {
-            background-color: #1c2b3a;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+            background: rgba(30, 42, 56, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
             width: 100%;
-            max-width: 900px;
+            max-width: 800px;
             box-sizing: border-box;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
-            animation: fadeIn 1s ease-out forwards;
+            transform: translateY(-50px);
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+            animation: fadeInUp 1s ease-out forwards;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
             color: #1e90ff;
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 2.5rem;
+            margin-bottom: 25px;
+            font-size: 2.8rem;
             font-weight: 700;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
             animation: colorChange 4s infinite alternate;
         }
 
@@ -54,58 +57,66 @@
 
         label {
             display: block;
-            margin-bottom: 15px;
-            color: #1e90ff;
-            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #87cefa;
+            font-size: 1.2rem;
             font-weight: 500;
         }
 
         textarea {
             width: 100%;
             height: 350px;
-            padding: 15px;
-            border: 1px solid #444;
-            border-radius: 10px;
-            background-color: #0a1a2b;
-            color: #dcdcdc;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #102033, #1f3b50);
+            color: #f0f0f0;
             font-family: 'Courier New', Courier, monospace;
-            line-height: 1.6;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+            line-height: 1.7;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
             transition: box-shadow 0.3s ease, border-color 0.3s ease;
-            resize: none; /* Impede o redimensionamento */
+            resize: none;
             box-sizing: border-box;
         }
 
         textarea:focus {
             outline: none;
             border-color: #1e90ff;
-            box-shadow: 0 0 15px rgba(30, 144, 255, 0.7);
+            box-shadow: 0 0 20px rgba(30, 144, 255, 0.8);
         }
 
         button {
-            background-color: #1e90ff;
+            background: linear-gradient(135deg, #1e90ff, #00bfff);
             border: none;
             color: #fff;
             padding: 15px 25px;
             text-align: center;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-top: 20px;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button i {
+            margin-right: 10px;
+            font-size: 1.2rem;
         }
 
         button:disabled {
-            background-color: #666;
+            background: #666;
             cursor: not-allowed;
         }
 
         button:hover:not(:disabled) {
-            background-color: #00bfff;
+            background: linear-gradient(135deg, #00bfff, #1e90ff);
             transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
         }
 
         @media (max-width: 768px) {
@@ -118,14 +129,13 @@
             }
         }
 
-        /* Estilos do overlay de carregamento */
         .loader-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -134,11 +144,11 @@
         }
 
         .loader {
-            border: 8px solid #f3f3f3;
+            border: 4px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
-            border-top: 8px solid #1e90ff;
-            width: 80px;
-            height: 80px;
+            border-top: 4px solid #1e90ff;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
         }
 
@@ -147,13 +157,12 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Estilos da barra de rolagem */
         textarea::-webkit-scrollbar {
             width: 12px;
         }
 
         textarea::-webkit-scrollbar-track {
-            background: #1c2b3a;
+            background: #1e2a38;
             border-radius: 10px;
         }
 
@@ -169,40 +178,46 @@
     </style>
 </head>
 <body>
-    <!-- Overlay de carregamento -->
+
     <div class="loader-overlay" id="loaderOverlay">
         <div class="loader"></div>
     </div>
 
     <div class="container" id="mainContent">
-        <h1>Criptografar Script Lua</h1>
+        <h1>obfuscator Utf8 Lua</h1>
         <form id="encryptForm">
             <label for="script">Script Lua:</label>
             <textarea id="script" name="script" required></textarea>
-            <button type="button" id="encryptButton" onclick="encryptScript()" disabled>Criptografar e Baixar</button>
+            <button type="button" id="encryptButton" onclick="encryptScript()" disabled>
+                <i class="fas fa-lock"></i> Criptografar e Baixar
+            </button>
         </form>
     </div>
 
     <script>
         function encryptScript() {
             const script = document.getElementById('script').value;
-
+    
             function createEncryptor() {
                 return function(text) {
-                    let result = "return(function() local a={";
+                    let result = "-- This file was generated using utf8 obfuscator v1.0.1 [https://utf8obfuscator.github.io/public/]\n\n";
+                    result += "return(function() local a={";
+                    
                     for (let i = 0; i < text.length; i++) {
                         const charCode = text.charCodeAt(i).toString(36);
                         result += `tonumber("${charCode}", 36),`;
                     }
+    
                     result = result.slice(0, -1);
                     result += "}; local k=(function() return (function() return load end)() end)(); return k(string.char(table.unpack(a)))(); end)()";
+    
                     return result;
                 }
             }
-
+    
             const encrypt = createEncryptor();
             const encryptedScript = encrypt(script);
-
+    
             const blob = new Blob([encryptedScript], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -211,25 +226,23 @@
             a.click();
             URL.revokeObjectURL(url);
         }
-
-        // Habilita o botão quando há texto na caixa de entrada
+    
         document.getElementById('script').addEventListener('input', function() {
             const script = this.value.trim();
             document.getElementById('encryptButton').disabled = script.length === 0;
         });
-
-        // Adiciona um delay de 1 segundo antes de remover o overlay
+    
         window.addEventListener('load', () => {
             const loaderOverlay = document.getElementById('loaderOverlay');
             const mainContent = document.getElementById('mainContent');
-            
+    
             setTimeout(() => {
                 loaderOverlay.style.opacity = 0;
                 mainContent.style.opacity = 1;
                 setTimeout(() => {
                     loaderOverlay.style.display = 'none';
-                }, 500); // Tempo suficiente para a transição de opacidade
-            }, 1000); // Delay antes da animação de fade-out
+                }, 500);
+            }, 1000);
         });
     </script>
 </body>
