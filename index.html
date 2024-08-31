@@ -178,11 +178,9 @@
     </style>
 </head>
 <body>
-
     <div class="loader-overlay" id="loaderOverlay">
         <div class="loader"></div>
     </div>
-
     <div class="container" id="mainContent">
         <h1>Obfuscator Utf8 Lua</h1>
         <form id="encryptForm">
@@ -193,7 +191,6 @@
             </button>
         </form>
     </div>
-
     <script>
         function encryptScript() {
             const script = document.getElementById('script').value;
@@ -201,16 +198,22 @@
             function createEncryptor() {
                 return function(text) {
                     let result = "-- This file was generated using utf8 obfuscator v1.0.1 [https://utf8obfuscator.github.io/public/]\n\n";
-                    result += "return(function() local a={";
-                    
+                    let obfuscatedData = [];
+                    let offset = 4;
+                    let xorKey = Math.floor(Math.random() * 256);
+
                     for (let i = 0; i < text.length; i++) {
-                        const charCode = text.charCodeAt(i).toString(36);
-                        result += `tonumber("${charCode}", 36),`;
+                        let charCode = text.charCodeAt(i) ^ xorKey;
+                        charCode = (charCode + offset) % 256;
+                        obfuscatedData.push(`(tonumber("${charCode.toString(36)}", 36))`);
                     }
-    
-                    result = result.slice(0, -1);
-                    result += "}; local k=(function() return (function() return load end)() end)(); return k(string.char(table.unpack(a)))(); end)()";
-    
+
+                    let obfuscationLayer = `return(function()local a={${obfuscatedData.join(',')}}local b={}for i=1,#a do b[i]=string.char(((a[i]-${offset})%256)~${xorKey})end return load(table.concat(b))()end)()`;
+
+                    result += obfuscationLayer;
+
+                    result = result.replace(/`/g, '\\`');
+
                     return result;
                 }
             }
