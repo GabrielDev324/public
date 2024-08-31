@@ -3,143 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flux Obfuscator</title>
+    <title>Criptografar Script Lua</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #2c2c2c;
-            color: #e0e0e0;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #0a1a2b;
+            color: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Impede rolagem enquanto o overlay está visível */
         }
+
+        .container {
+            background-color: #1c2b3a;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         h1 {
             color: #1e90ff;
             text-align: center;
             margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+            animation: colorChange 4s infinite alternate;
         }
-        form {
-            max-width: 800px;
-            width: 100%;
-            background-color: #333;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+
+        @keyframes colorChange {
+            from { color: #1e90ff; }
+            to { color: #00bfff; }
         }
+
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             color: #1e90ff;
-            font-size: 18px;
+            font-size: 1.1rem;
+            font-weight: 500;
         }
+
         textarea {
             width: 100%;
-            height: 200px;
-            margin: 5px 0;
-            padding: 10px;
+            height: 350px;
+            padding: 15px;
             border: 1px solid #444;
-            border-radius: 4px;
-            background-color: #1e1e1e;
+            border-radius: 10px;
+            background-color: #0a1a2b;
             color: #dcdcdc;
             font-family: 'Courier New', Courier, monospace;
-            resize: none;
-            overflow: auto;
-            line-height: 1.5;
-            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.7);
-            font-size: 16px;
+            line-height: 1.6;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+            resize: none; /* Impede o redimensionamento */
+            box-sizing: border-box;
         }
-        /* Estilização da barra de rolagem */
-        textarea::-webkit-scrollbar {
-            width: 12px;
+
+        textarea:focus {
+            outline: none;
+            border-color: #1e90ff;
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.7);
         }
-        textarea::-webkit-scrollbar-track {
-            background: #2c2c2c;
-            border-radius: 6px;
-        }
-        textarea::-webkit-scrollbar-thumb {
-            background: #1e90ff;
-            border-radius: 6px;
-            transition: background 0.3s;
-        }
-        textarea::-webkit-scrollbar-thumb:hover {
-            background: #1c86ee;
-        }
+
         button {
             background-color: #1e90ff;
             border: none;
-            color: #ffffff;
-            padding: 10px 20px;
+            color: #fff;
+            padding: 15px 25px;
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin-top: 10px;
-            border-radius: 4px;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        button:hover {
-            background-color: #1c86ee;
-            transform: translateY(-2px);
-        }
+
         button:disabled {
-            background-color: #555;
+            background-color: #666;
             cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #00bfff;
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            textarea {
+                height: 250px;
+            }
+            button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Estilos do overlay de carregamento */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid #1e90ff;
+            width: 80px;
+            height: 80px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Estilos da barra de rolagem */
+        textarea::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: #1c2b3a;
+            border-radius: 10px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: #1e90ff;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #00bfff;
         }
     </style>
 </head>
 <body>
-    <form id="encryptForm">
-        <h1>Flux Obfuscator Lua</h1>
-        <label for="script">Script Lua:</label>
-        <textarea id="script" name="script" required></textarea>
-        <button id="encryptButton" type="button" disabled>Criptografar e Baixar</button>
-    </form>
-    <script>
-        document.getElementById('script').addEventListener('input', function() {
-            const textarea = document.getElementById('script');
-            const button = document.getElementById('encryptButton');
-            button.disabled = textarea.value.trim() === '';
-        });
+    <!-- Overlay de carregamento -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader"></div>
+    </div>
 
-        document.getElementById('encryptButton').addEventListener('click', function() {
+    <div class="container" id="mainContent">
+        <h1>Criptografar Script Lua</h1>
+        <form id="encryptForm">
+            <label for="script">Script Lua:</label>
+            <textarea id="script" name="script" required></textarea>
+            <button type="button" id="encryptButton" onclick="encryptScript()" disabled>Criptografar e Baixar</button>
+        </form>
+    </div>
+
+    <script>
+        function encryptScript() {
             const script = document.getElementById('script').value;
 
-            function encrypt(text) {
-                let result = "-- This file was generated using Flux Obfuscator v5.0.0\n\n";
-
-                // Chave dinâmica
-                const keyPart1 = 42;
-                const keyPart2 = 37;
-                const key = (keyPart1 + keyPart2) * 2;
-
-                // Função de criptografia com nomes de variáveis e funções ofuscados
-                result += "local function x5bR6(t,l9p)local Rz=''for e9=1,#t do local Vz=t[e9]Rz=Rz..string.char(Vz-(l9p%32)+(l9p%18))end return Rz end;";
-                result += "local function y7gJ4(data) local j=" + key + " local b9=x5bR6(data,j) local M8=load(b9) return M8 end;";
-
-                // Ofuscação adicional do código
-                result += "local gR2b={";
-                for (let i = 0; i < text.length; i++) {
-                    const charCode = text.charCodeAt(i) + (key % 32) - (key % 18);
-                    result += `${charCode},`;
+            function createEncryptor() {
+                return function(text) {
+                    let result = "return(function() local a={";
+                    for (let i = 0; i < text.length; i++) {
+                        const charCode = text.charCodeAt(i).toString(36);
+                        result += `tonumber("${charCode}", 36),`;
+                    }
+                    result = result.slice(0, -1);
+                    result += "}; local k=(function() return (function() return load end)() end)(); return k(string.char(table.unpack(a)))(); end)()";
+                    return result;
                 }
-                result = result.slice(0, -1);
-                result += "};";
-
-                // Execução do código ofuscado
-                result += "local a6=y7gJ4(gR2b);";
-                result += "a6();";
-
-                return result;
             }
 
+            const encrypt = createEncryptor();
             const encryptedScript = encrypt(script);
+
             const blob = new Blob([encryptedScript], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -147,6 +210,26 @@
             a.download = 'obfuscated.lua';
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        // Habilita o botão quando há texto na caixa de entrada
+        document.getElementById('script').addEventListener('input', function() {
+            const script = this.value.trim();
+            document.getElementById('encryptButton').disabled = script.length === 0;
+        });
+
+        // Adiciona um delay de 1 segundo antes de remover o overlay
+        window.addEventListener('load', () => {
+            const loaderOverlay = document.getElementById('loaderOverlay');
+            const mainContent = document.getElementById('mainContent');
+            
+            setTimeout(() => {
+                loaderOverlay.style.opacity = 0;
+                mainContent.style.opacity = 1;
+                setTimeout(() => {
+                    loaderOverlay.style.display = 'none';
+                }, 500); // Tempo suficiente para a transição de opacidade
+            }, 1000); // Delay antes da animação de fade-out
         });
     </script>
 </body>
